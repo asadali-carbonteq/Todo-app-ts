@@ -1,13 +1,13 @@
 import { PrismaClient, User } from "@prisma/client";
 import { Request, Response } from "express";
 const { v4: uuidv4 } = require('uuid');
-
+import IUserService from "../../Application/IUserService";
 import UserService from "../../Application/UserService"
 
 
 export default class UserController {
     private prisma: PrismaClient;
-    private myUserService: UserService;
+    private myUserService: IUserService;
 
     constructor() {
         this.prisma = new PrismaClient();

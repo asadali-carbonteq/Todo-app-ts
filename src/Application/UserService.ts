@@ -2,10 +2,11 @@ import UserRepository from "../Infrastructure/UserRepository";
 const { v4: uuidv4 } = require('uuid');
 import { ModelFactory, User } from "../Domain/FactoryMethod";
 import { Request, Response } from "express";
+import IUserRepository from "../Infrastructure/IUserRepository";
 
 
 export default class UserService {
-    private userRepository: UserRepository;
+    private userRepository: IUserRepository;
 
 
     constructor() {

@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import TodoService from "../../Application/TodoService";
+import ITodoService from "../../Application/ITodoService";
 
 export default class TodoController {
-    private myTodoService: TodoService;
+    private myTodoService: ITodoService;
 
     constructor() {
         this.myTodoService = new TodoService();

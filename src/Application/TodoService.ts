@@ -1,10 +1,14 @@
 import TodoRepository from "../Infrastructure/TodoRepository";
 import { ModelFactory, Todo } from "../Domain/FactoryMethod";
 import { Request, Response } from "express";
+import ITodoService from "./ITodoService";
 const { v4: uuidv4 } = require('uuid');
+import ITodoRepository from "../Infrastructure/ITodoRepository";
 
-export default class TodoService {
-    private todoRepository: TodoRepository;
+
+
+export default class TodoService implements ITodoService {
+    private todoRepository: ITodoRepository;
 
 
     constructor() {
