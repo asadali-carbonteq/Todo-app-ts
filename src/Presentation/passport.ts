@@ -9,7 +9,7 @@ passport.deserializeUser(function (user: any, done: any) {
     done(null, user);
 });
 
-passport.use(new GoogleStrategy({
+passport.use(new GoogleStrategy({   //this data should have been save in an environment variable.
     clientID: "980408164835-6pcvbpl2n2a9i8e7646seaeg954lsd55.apps.googleusercontent.com",
     clientSecret: "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",
     callbackURL: "http://localhost:8080/google/callback",

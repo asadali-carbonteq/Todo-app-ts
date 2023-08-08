@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { User } from "../Domain/FactoryMethod";
+import { User } from "../../Domain/FactoryMethod";
 
 export default class UserRepository {
     private prisma: PrismaClient;

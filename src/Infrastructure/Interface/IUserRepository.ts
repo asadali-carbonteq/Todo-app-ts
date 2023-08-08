@@ -1,4 +1,4 @@
-import { User } from "../Domain/FactoryMethod";
+import { User } from "../../Domain/FactoryMethod";
 
 export default interface IUserRepository {
     CreateUser(user: User): Promise<any>;

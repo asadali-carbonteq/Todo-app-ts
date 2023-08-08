@@ -1,8 +1,9 @@
-import UserRepository from "../Infrastructure/UserRepository";
+import UserRepository from "../../Infrastructure/Repository/UserRepository";
 const { v4: uuidv4 } = require('uuid');
-import { ModelFactory, User } from "../Domain/FactoryMethod";
+import { ModelFactory, User } from "../../Domain/FactoryMethod";
 import { Request, Response } from "express";
-import IUserRepository from "../Infrastructure/IUserRepository";
+import IUserRepository from "../../Infrastructure/Interface/IUserRepository";
+import { UserNotCreatedException, UserNotDeletedException, UserNotUpdatedException } from "../Error/UserServiceError";
 
 
 export default class UserService {
@@ -26,12 +27,24 @@ export default class UserService {
         user.setPassword(data.password);
 
         const createdUser = await this.userRepository.CreateUser(user);
+
+        if (!createdUser) {
+            res.status(400).json({ message: "There was some error while Signup." })
+            throw new UserNotCreatedException("New User Not Created");
+        }
+
         return createdUser;
     }
 
 
     async deleteUser(req: Request, res: Response) {
         const deletedUser = await this.userRepository.DeleteUser(req.params.id);
+
+        if (!deletedUser) {
+            res.status(400).json({ message: "There was some error deleting the user." });
+            throw new UserNotDeletedException("User Not Deleted");
+        }
+
         return deletedUser;
     }
 
@@ -48,6 +61,12 @@ export default class UserService {
         user.setTodo(data.todo);
 
         const updatedUser = await this.userRepository.UpdateUser(user);
+
+        if (!updatedUser) {
+            res.status(400).json({ message: "There was some error updating the User." });
+            throw new UserNotUpdatedException("User Not Updated");
+        }
+
         return updatedUser;
     }
 

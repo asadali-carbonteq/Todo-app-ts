@@ -24,7 +24,7 @@ const UpdateTodo: (req: Request, res: Response) => void = (req, res) => {
 }
 
 
-todoRouter.get("/todo/:id", getAllTodos);
+todoRouter.get("/todo/:id/data", getAllTodos);
 todoRouter.post("/todo/add", auth, AddTodo);
 todoRouter.delete("/todo/delete/:id", DeleteTodo);
 todoRouter.put("/todo/update/:id", UpdateTodo);

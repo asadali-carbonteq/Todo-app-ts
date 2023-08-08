@@ -1,7 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-import { Todo } from "../Domain/FactoryMethod";
-import ITodoRepository from "./ITodoRepository";
-
+import { Todo } from "../../Domain/FactoryMethod";
+import ITodoRepository from "../Interface/ITodoRepository";
 
 
 export default class TodoRepository implements ITodoRepository {
@@ -11,18 +10,25 @@ export default class TodoRepository implements ITodoRepository {
         this.prisma = new PrismaClient();
     }
 
-    async GetTodo(id: string) {
+    async GetTodo(id: string, pages: number, size: number) {
         try {
+            const Per_Page = size;
+            const skip = (Per_Page * (pages - 1));
             const todos = await this.prisma.todo.findMany({
+                skip: skip,
+                take: Per_Page,
                 where: {
                     authorId: id,
+                },
+                orderBy: {
+                    createdAt: 'asc',
                 }
             });
             console.log(todos);
             return todos;
         }
         catch (error) {
-            console.log("There is some error in GetTodo()-Repository");
+            console.log("There is some thing wrong:");
             console.log(error);
         }
     }
