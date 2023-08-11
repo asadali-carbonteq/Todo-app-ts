@@ -1,80 +1,84 @@
 import TodoRepository from "../../Infrastructure/Repository/TodoRepository";
-import { ModelFactory, Todo } from "../../Domain/FactoryMethod";
+import { Factory } from "../../Domain/FactoryMethod";
 import { Request, Response } from "express";
-import ITodoService from "../Interface/ITodoService";
 const { v4: uuidv4 } = require('uuid');
-import ITodoRepository from "../../Infrastructure/Interface/ITodoRepository";
-import { TodoNotFoundException, InvalidPageOrSizeException, TodoNotCreatedException, TodoNotUpdatedException, TodoNotDeletedException } from "../Error/TodoServiceError";
+import { TodoNotFoundException, InvalidPageOrSizeException, TodoNotCreatedException, TodoNotUpdatedException, TodoNotDeletedException } from "../../Infrastructure/Error/TodoServiceError";
+import { inject, injectable } from "inversify";
 
 
+@injectable()
+export default class TodoService {
+    private todoRepository: TodoRepository;
 
-export default class TodoService implements ITodoService {
-    private todoRepository: ITodoRepository;
 
-
-    constructor() {
-        this.todoRepository = new TodoRepository();
+    constructor(
+        @inject(TodoRepository) todoRepo: TodoRepository
+    ) {
+        this.todoRepository = todoRepo;
     }
 
 
     async getTodo(req: Request, res: Response) {
-        const pages = parseInt(req.query.pages as string);
-        const size = parseInt(req.query.size as string);
+        try {
+            const { userId } = req.body;
+            const pages = parseInt(req.query.pages as string);
+            const size = parseInt(req.query.size as string);
 
-        if (isNaN(pages) || isNaN(size) || pages < 1 || size < 1) {
-            throw new InvalidPageOrSizeException("Invalid Pagination Values");
+            if (isNaN(pages) || isNaN(size) || pages < 1 || size < 1) {
+                throw new InvalidPageOrSizeException("Invalid Pagination Values");
+            }
+
+            const todos = await this.todoRepository.GetTodo(userId, pages, size);
+
+            return todos;
         }
-
-        const todos = await this.todoRepository.GetTodo(req.params.id, pages, size);
-
-        if (!todos || todos.length === 0) {
+        catch {
             throw new TodoNotFoundException("Todo Not Found");
         }
-
-        return todos;
     }
 
 
 
     async addTodo(req: Request, res: Response) {
-        const data = req.body;
-        const generatedUUID = uuidv4();
-        const myModelFactory = new ModelFactory();
+        try {
+            console.log(req.body);
+            const data = req.body;
+            const generatedUUID = uuidv4();
+            const myFactory = new Factory();
+            const todo = myFactory.TodoFactoryMethod(generatedUUID, data.body, data.userId);
 
-        const todo = myModelFactory.getModel("todo") as Todo;
-        todo.setId(generatedUUID);
-        todo.setBody(data.body);
-        todo.setAuthorId(data.authorId);
+            const createdTodo = await this.todoRepository.CreateTodo(todo);
 
-        const createdTodo = await this.todoRepository.CreateTodo(todo);
-
-        if (!createdTodo) {
+            return createdTodo;
+        } catch (error) {
             throw new TodoNotCreatedException("Todo Not Created");
         }
-        return createdTodo;
     }
 
 
     async updateTodo(req: Request, res: Response) {
-        const data = req.body;
-        const updatedTodo = await this.todoRepository.UpdateTodo(data.body, req.params.id)
+        try {
+            console.log(req.body);
+            const data = req.body;
+            console.log(data);
 
-        if (!updatedTodo) {
+            const updatedTodo = await this.todoRepository.UpdateTodo(req.params.id, data.body)
+
+            return updatedTodo;
+        } catch (error) {
             throw new TodoNotUpdatedException("Todo Not Updated");
         }
-
-        return updatedTodo;
     }
 
 
     async deleteTodo(req: Request, res: Response) {
-        const deletedTodo = await this.todoRepository.DeleteTodo(req.params.id);
-
-        if (!deletedTodo) {
+        try {
+            const deletedTodo = await this.todoRepository.DeleteTodo(req.params.id);
+            return deletedTodo;
+        }
+        catch (error) {
             throw new TodoNotDeletedException("Todo Not Deleted");
         }
-
-        return deletedTodo;
     }
 }
 

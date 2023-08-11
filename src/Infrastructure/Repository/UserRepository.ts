@@ -1,6 +1,13 @@
 import { PrismaClient } from "@prisma/client";
-import { User } from "../../Domain/FactoryMethod";
+import { User } from "../../Domain/User";
+const bcrypt = require('bcrypt');
+import jwt from "jsonwebtoken";
+import { UserAlreadyExistException, UserDoNotExistException } from "../Error/RepositoryError";
+import { injectable } from "inversify";
+const SECRET_KEY = "Hello_World";
 
+
+@injectable()
 export default class UserRepository {
     private prisma: PrismaClient;
 
@@ -8,21 +15,64 @@ export default class UserRepository {
         this.prisma = new PrismaClient();
     }
 
-    async CreateUser(user: User) {
+    async SignIn(email: string, password: string) {
         try {
-            const createdUser = await this.prisma.user.create({
-                data: {
-                    user_id: user.getId(),
-                    email: user.getEmail(),
-                    name: user.getName(),
-                    password: user.getPassword()
-                }
+            const existingUser = await this.prisma.user.findUnique({
+                where: {
+                    email: email,
+                },
             });
-            return createdUser;
+            if (!existingUser) {
+                throw new UserDoNotExistException("User Do Not Exist");
+            }
+
+            const matchPassword = await bcrypt.compare(password, existingUser.password);
+            if (!matchPassword) {
+                return new UserDoNotExistException("User Email or Password incorrect");
+            }
+
+            const token = jwt.sign({ email: existingUser.email, id: existingUser.user_id }, SECRET_KEY);
+
+            const result = [{ user: existingUser, token: token, message: "User SignIn Successful" }];
+            return result;
         }
         catch (error) {
-            console.log(error);
-            return error;
+            const result = [{ statuscode: 400, error: error, message: "Signin Failed" }];
+            return result;
+        }
+    }
+
+    async CreateUser(user: User) {
+        try {
+            const existingUser = await this.prisma.user.findUnique({
+                where: {
+                    email: user.getEmail(),
+                }
+            });
+            if (!existingUser) {
+                const hashedPassword = await bcrypt.hash(user.getPassword(), 10);
+
+                const createdUser = await this.prisma.user.create({
+                    data: {
+                        user_id: user.getId(),
+                        email: user.getEmail(),
+                        name: user.getName(),
+                        password: hashedPassword,
+                    }
+                });
+
+                const token = jwt.sign({ email: user.getEmail(), id: user.getId() }, SECRET_KEY);
+                console.log(token);
+                const result = [{ user: createdUser, token: token, message: "New User Created" }];
+
+                return result;
+            } else {
+                return new UserAlreadyExistException("The user with this email already exists.");
+            }
+        }
+        catch (error) {
+            const result = [{ statuscode: 400, error: error, message: "Signin Failed" }];
+            return result;
         }
     }
 
@@ -60,12 +110,9 @@ export default class UserRepository {
                     password: user.getPassword(),
                 }
             })
-            console.log("User Updated Successfullly!!!");
-            console.log(updatedUser);
             return updatedUser;
         }
         catch (error) {
-            console.log(error);
             return error;
         }
     }

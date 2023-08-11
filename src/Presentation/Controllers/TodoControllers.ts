@@ -1,13 +1,17 @@
+import 'reflect-metadata'
 import { Request, Response } from "express";
 import TodoService from "../../Application/Service/TodoService";
-import ITodoService from "../../Application/Interface/ITodoService";
-import { InvalidPageOrSizeException } from "../../Application/Error/TodoServiceError";
+import { inject, injectable } from 'inversify';
 
+
+@injectable()
 export default class TodoController {
-    private myTodoService: ITodoService;
+    private myTodoService: TodoService;
 
-    constructor() {
-        this.myTodoService = new TodoService();
+    constructor(
+        @inject(TodoService) todoService: TodoService
+    ) {
+        this.myTodoService = todoService;
     }
 
     async getTodo(req: Request, res: Response) {

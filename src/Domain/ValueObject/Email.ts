@@ -1,4 +1,4 @@
-import { InvalidEmailException } from "../Error/DomainError";
+import { InvalidEmailException } from "../../Infrastructure/Error/DomainError";
 
 export class Email {
     private Email: string;
@@ -8,10 +8,10 @@ export class Email {
     }
 
     validate(email: string): boolean {
-        if (!this.Email) {
+        if (!email) {
             return false;
         }
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const emailRegex: RegExp = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
         return emailRegex.test(email);
     }
 

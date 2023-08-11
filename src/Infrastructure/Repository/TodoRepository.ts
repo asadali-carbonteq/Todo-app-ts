@@ -1,9 +1,10 @@
 import { PrismaClient } from "@prisma/client";
-import { Todo } from "../../Domain/FactoryMethod";
-import ITodoRepository from "../Interface/ITodoRepository";
+import { Todo } from "../../Domain/Todo";
+import { injectable } from "inversify";
 
 
-export default class TodoRepository implements ITodoRepository {
+@injectable()
+export default class TodoRepository {
     private prisma: PrismaClient;
 
     constructor() {
@@ -56,7 +57,7 @@ export default class TodoRepository implements ITodoRepository {
         }
     }
 
-    async UpdateTodo(body: string, id: string) {
+    async UpdateTodo(id: string, body: string) {
         try {
             const updatedTodo = await this.prisma.todo.update({
                 where: {

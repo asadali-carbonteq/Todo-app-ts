@@ -1,50 +1,33 @@
-import { PrismaClient, User } from "@prisma/client";
 import { Request, Response } from "express";
-const { v4: uuidv4 } = require('uuid');
-import IUserService from "../../Application/Interface/IUserService";
 import UserService from "../../Application/Service/UserService"
+import { inject, injectable } from "inversify";
 
-
+@injectable()
 export default class UserController {
-    private prisma: PrismaClient;
-    private myUserService: IUserService;
+    private myUserService: UserService;
 
-    constructor() {
-        this.prisma = new PrismaClient();
-        this.myUserService = new UserService();
+    constructor(
+        @inject(UserService) userService: UserService
+    ) {
+        this.myUserService = userService;
     }
 
     async SignIn(req: Request, res: Response) {
-        const data = req.body;
-        console.log(data);
         try {
-            const user = await this.prisma.user.findUnique({
-                where: {
-                    email: data.email,
-                },
-            })
-            if (user && user.password === data.password) {
-                console.log("successful Sign in");
-                res.status(200).json({ message: "Signin Successful" });
-            } else {
-                console.log("Wrong Credentials, Sign in Failed!!!");
-                res.status(401).json({ message: "Enter the correct Username and Password" });
-            }
+            const signinUser = await this.myUserService.signIn(req, res);
+            res.status(201).json({ signinUser });
         }
         catch (error) {
-            console.log(error);
-            res.status(500).json({ message: error })
+            res.status(500).json({ error, message: "There was some error while Signup." })
         }
     }
 
     async SignUp(req: Request, res: Response) {
         try {
             const createdUser = await this.myUserService.createUser(req, res);
-            console.log("New User Created.");
-            res.status(201).json({ message: "Signup Successful, new User created.", createdUser });
+            res.status(201).json({ createdUser });
         }
         catch (error) {
-            console.log(error);
             res.status(500).json({ error, message: "There was some error while Signup." })
         }
     }

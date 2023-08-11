@@ -53,8 +53,6 @@ googleRouter.get('/failed', (req, res) => {
 });
 
 googleRouter.get("/success", isLoggedIn, (req, res) => {
-    const data = req.body;
-    console.log(data);
     res.send(`Welcome to the site`);
 })
 

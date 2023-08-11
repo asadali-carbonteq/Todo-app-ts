@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { faker } from '@faker-js/faker';
+const bcrypt = require('bcrypt');
 
 
 export async function seedDatabase() {
@@ -14,18 +15,19 @@ export async function seedDatabase() {
         const todos = [];
 
         for (let i = 0; i < userCount; i++) {
+            const hashedPassword = await bcrypt.hash(faker.internet.password(), 10);
             const user = await prisma.user.create({
                 data: {
                     user_id: faker.string.uuid(),
                     email: faker.internet.email(),
                     name: faker.person.fullName(),
-                    password: faker.internet.password(),
+                    password: hashedPassword,
                 }
             });
 
             users.push(user);
 
-            const todoCount = Math.floor(Math.random() * 5 + 1);//Every user will have 1 to 5 todos randomly selected.
+            const todoCount = Math.floor(Math.random() * 5 + 2);//Every user will have 1 to 5 todos randomly selected.
 
             for (let j = 0; j < todoCount; j++) {
                 const todo = await prisma.todo.create({
