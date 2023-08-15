@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import { Container } from "inversify";
 import TodoController from "./Controllers/TodoControllers";
-import TodoService from '../Application/Service/TodoService';
+import { TodoService } from '../Application/Service/TodoService';
 import TodoRepository from "../Infrastructure/Repository/TodoRepository";
 import UserController from "./Controllers/UserControllers";
 import UserService from '../Application/Service/UserService';

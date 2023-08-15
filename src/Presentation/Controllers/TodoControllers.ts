@@ -1,7 +1,17 @@
 import 'reflect-metadata'
 import { Request, Response } from "express";
-import TodoService from "../../Application/Service/TodoService";
+import { TodoService } from "../../Application/Service/TodoService";
 import { inject, injectable } from 'inversify';
+import { InvalidPageOrSizeException } from '../../Infrastructure/Error/TodoServiceError';
+import { GetTodoCommand } from '../../Application/command/GetTodoCommand';
+const { CommandBus, LoggerMiddleware } = require("simple-command-bus");
+const commandHandlerMiddleware = require("../../Infrastructure/commandHandlerMiddleware")
+
+const commandBus = new CommandBus([
+    new LoggerMiddleware(console),
+    commandHandlerMiddleware
+]);
+
 
 
 @injectable()
@@ -16,9 +26,19 @@ export default class TodoController {
 
     async getTodo(req: Request, res: Response) {
         try {
-            const getTodo = await this.myTodoService.getTodo(req, res);
-            console.log("Get Todo Successfull");
-            res.status(200).json({ message: "Get Todos Successfull.", getTodo })
+            const userId = req.body.userId;
+            const pages = parseInt(req.query.pages as string);
+            const size = parseInt(req.query.size as string);
+
+            //Validation
+            if (isNaN(pages) || isNaN(size) || pages < 1 || size < 1) {
+                throw new InvalidPageOrSizeException("Invalid Pagination Values");
+            }
+
+            const getTodoCommand = new GetTodoCommand(userId, pages, size);
+            const todo = await commandBus.handle(getTodoCommand);
+
+            res.status(200).json({ message: "Get Todos Successfull.", todo })
         }
         catch (error) {
             console.log(error);

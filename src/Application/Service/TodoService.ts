@@ -4,36 +4,47 @@ import { Request, Response } from "express";
 const { v4: uuidv4 } = require('uuid');
 import { TodoNotFoundException, InvalidPageOrSizeException, TodoNotCreatedException, TodoNotUpdatedException, TodoNotDeletedException } from "../../Infrastructure/Error/TodoServiceError";
 import { inject, injectable } from "inversify";
+import { Command } from "../../Infrastructure/commandHandler/GetTodoHandler";
 
 
 @injectable()
-export default class TodoService {
+export class TodoService {
     private todoRepository: TodoRepository;
 
 
     constructor(
         @inject(TodoRepository) todoRepo: TodoRepository
     ) {
+
+
         this.todoRepository = todoRepo;
+        console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        console.log(typeof todoRepo, String(todoRepo));
     }
 
 
-    async getTodo(req: Request, res: Response) {
+    async getTodo(command: Command) {
         try {
-            const { userId } = req.body;
-            const pages = parseInt(req.query.pages as string);
-            const size = parseInt(req.query.size as string);
+            const userId = command.userId;
+            const pages = command.pages;
+            const size = command.size;
 
             if (isNaN(pages) || isNaN(size) || pages < 1 || size < 1) {
                 throw new InvalidPageOrSizeException("Invalid Pagination Values");
             }
 
-            const todos = await this.todoRepository.GetTodo(userId, pages, size);
+            console.log("hello hello Service here!");
+            console.log(userId, pages, size);
 
+            console.log(this.todoRepository);
+
+            const todos = await this.todoRepository.GetTodo(userId, pages, size);
+            console.log("these are the todoes, ", todos);
             return todos;
         }
-        catch {
-            throw new TodoNotFoundException("Todo Not Found");
+        catch (error) {
+            console.log(error);
+            //throw new TodoNotFoundException("Todo Not Found");
         }
     }
 
@@ -41,7 +52,6 @@ export default class TodoService {
 
     async addTodo(req: Request, res: Response) {
         try {
-            console.log(req.body);
             const data = req.body;
             const generatedUUID = uuidv4();
             const myFactory = new Factory();
