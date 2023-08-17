@@ -1,6 +1,23 @@
+import 'reflect-metadata'
 import { Request, Response } from "express";
-import UserService from "../../Application/Service/UserService"
+import { UserService } from "../../Application/Service/UserService"
 import { inject, injectable } from "inversify";
+/**
+//import { SignInCommand } from "../../Application/command/UserCommand/SignInCommand";
+
+const { CommandBus, LoggerMiddleware } = require("simple-command-bus");
+const commandHandlerMiddleware = require("../../Infrastructure/commandHandlerMiddleware")
+
+
+
+const commandBus = new CommandBus([
+    new LoggerMiddleware(console),
+    commandHandlerMiddleware
+]);
+ * 
+ */
+
+
 
 @injectable()
 export default class UserController {
@@ -13,14 +30,27 @@ export default class UserController {
     }
 
     async SignIn(req: Request, res: Response) {
+
+    }
+
+    /**
+     * 
+    
+    async SignIn(req: Request, res: Response) {
         try {
-            const signinUser = await this.myUserService.signIn(req, res);
+            const data = req.body;
+            //console.log("hello hello data from controller: ", data);
+            const mySignInCommand = new SignInCommand(data.email, data.password);
+            const signinUser = await commandBus.handle(mySignInCommand);
             res.status(201).json({ signinUser });
         }
         catch (error) {
             res.status(500).json({ error, message: "There was some error while Signup." })
         }
     }
+    */
+
+
 
     async SignUp(req: Request, res: Response) {
         try {
@@ -31,6 +61,8 @@ export default class UserController {
             res.status(500).json({ error, message: "There was some error while Signup." })
         }
     }
+
+
 
     async Delete(req: Request, res: Response) {
         try {
@@ -43,6 +75,8 @@ export default class UserController {
             res.status(500).json({ error, message: "There was some error deleting the user." });
         }
     }
+
+
 
     async Update(req: Request, res: Response) {
         try {

@@ -3,9 +3,16 @@ import { Request, Response } from "express";
 import { TodoService } from "../../Application/Service/TodoService";
 import { inject, injectable } from 'inversify';
 import { InvalidPageOrSizeException } from '../../Infrastructure/Error/TodoServiceError';
-import { GetTodoCommand } from '../../Application/command/GetTodoCommand';
+import { GetTodoCommand } from '../../Application/command/TodoCommand/GetTodoCommand';
+import { AddTodoCommand } from '../../Application/command/TodoCommand/AddTodoCommand';
+import { UpdateTodoCommand } from '../../Application/command/TodoCommand/UpdateTodoCommand';
+import { DeleteTodoCommand } from '../../Application/command/TodoCommand/DeleteTodoCommand';
 const { CommandBus, LoggerMiddleware } = require("simple-command-bus");
 const commandHandlerMiddleware = require("../../Infrastructure/commandHandlerMiddleware")
+//import { CommandBus, LoggerMiddleware } from "simple-command-bus";
+//import commandHandlerMiddleware from "../../Infrastructure/commandHandlerMiddleware";
+
+
 
 const commandBus = new CommandBus([
     new LoggerMiddleware(console),
@@ -48,20 +55,26 @@ export default class TodoController {
 
     async addTodo(req: Request, res: Response) {
         try {
-            const createdTodo = await this.myTodoService.addTodo(req, res);
+            const data = req.body;
+            const myAddTodoCommand = new AddTodoCommand(data.body, data.userId);
+            const todo = await commandBus.handle(myAddTodoCommand);
+
             console.log("New Todo Created:");
-            res.status(201).json({ message: "New Todo Created", createdTodo })
+            res.status(201).json({ message: "New Todo Created", todo })
         } catch (error) {
             console.log(error);
             res.status(400).json({ error, message: "There was some error while Creating a Todo." });
         }
     }
 
+
     async updateTodo(req: Request, res: Response) {
         try {
-            const updatedTodo = await this.myTodoService.updateTodo(req, res);
+            const body = req.body.body;
+            const myUpdateTodoCommand = new UpdateTodoCommand(req.params.id, body);
+            const todo = await commandBus.handle(myUpdateTodoCommand);
             console.log("Updated successfully!!")
-            res.status(202).json({ message: "Todo Updated Successfully", updatedTodo })
+            res.status(202).json({ message: "Todo Updated Successfully", todo })
         } catch (error) {
             console.log(error);
             res.status(501).json({ error, message: "There was some error while Updating the Todo." })
@@ -70,9 +83,12 @@ export default class TodoController {
 
     async deleteTodo(req: Request, res: Response) {
         try {
-            const deletedTodo = await this.myTodoService.deleteTodo(req, res);
+            const todoId = req.params.id;
+            const myDeleteTodoCommand = new DeleteTodoCommand(todoId);
+            const todo = await commandBus.handle(myDeleteTodoCommand);
+
             console.log("Todo Deleted successfully!!")
-            res.status(201).json({ message: "Todo Deleted Successfully.", deletedTodo })
+            res.status(201).json({ message: "Todo Deleted Successfully.", todo })
         }
         catch (error) {
             console.log(error);

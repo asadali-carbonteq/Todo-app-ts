@@ -13,6 +13,7 @@ export default class TodoRepository {
 
     async GetTodo(id: string, pages: number, size: number) {
         try {
+            console.log("hello hello from the repository")
             const Per_Page = size;
             const skip = (Per_Page * (pages - 1));
             const todos = await this.prisma.todo.findMany({
@@ -25,7 +26,7 @@ export default class TodoRepository {
                     createdAt: 'asc',
                 }
             });
-            console.log(todos);
+            console.log("hello hello out the prisma.todo.findmany")
             return todos;
         }
         catch (error) {
@@ -34,15 +35,15 @@ export default class TodoRepository {
         }
     }
 
-    async CreateTodo(todo: Todo) {
+    async CreateTodo(id: string, body: string, userId: string) {
         try {
             const createdTodo = await this.prisma.todo.create({
                 data: {
-                    todo_id: todo.getId(),
-                    body: todo.getBody(),
+                    todo_id: id,
+                    body: body,
                     author: {
                         connect: {
-                            user_id: todo.getAuthorId(),
+                            user_id: userId,
                         }
                     }
                 }

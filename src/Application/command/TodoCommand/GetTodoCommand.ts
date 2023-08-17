@@ -6,7 +6,5 @@ export class GetTodoCommand extends Command {
         this.userId = userId;
         this.pages = pages;
         this.size = size;
-
-        console.log("Hello Hello getTodoCommand");
     }
 }

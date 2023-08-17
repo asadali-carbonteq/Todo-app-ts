@@ -31,5 +31,8 @@ const protect = async (req: Request, res: Response, next: NextFunction) => {
 export default protect;
 
 /*
+Mr.Asad
+asad@test.com
+asad
 30112f9c-898a-4196-b9c4-54962b6a98c9
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFzYWRAdGVzdC5jb20iLCJpZCI6IjMwMTEyZjljLTg5OGEtNDE5Ni1iOWM0LTU0OTYyYjZhOThjOSIsImlhdCI6MTY5MjA4NjU0MH0.9W-i_EXoIguw6trn57z3gNn_33EewuSp4z0p2y-si1Q */

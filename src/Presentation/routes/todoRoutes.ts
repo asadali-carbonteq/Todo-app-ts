@@ -9,7 +9,6 @@ import DIContainer from "../di-container";
 const todoRouter = express.Router();
 
 const controller = DIContainer.get<TodoController>(TodoController);
-//const controller = new TodoController();
 
 const getAllTodos: (req: Request, res: Response) => void = (req, res) => {
     controller.getTodo(req, res);

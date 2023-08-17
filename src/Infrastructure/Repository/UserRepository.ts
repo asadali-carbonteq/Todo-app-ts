@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 import jwt from "jsonwebtoken";
 import { UserAlreadyExistException, UserDoNotExistException } from "../Error/RepositoryError";
 import { injectable } from "inversify";
+import prisma from "../../libs/prisma";
 const SECRET_KEY = "Hello_World";
 
 
@@ -12,7 +13,7 @@ export default class UserRepository {
     private prisma: PrismaClient;
 
     constructor() {
-        this.prisma = new PrismaClient();
+        this.prisma = prisma;
     }
 
     async SignIn(email: string, password: string) {
@@ -33,11 +34,11 @@ export default class UserRepository {
 
             const token = jwt.sign({ email: existingUser.email, id: existingUser.user_id }, SECRET_KEY);
 
-            const result = [{ user: existingUser, token: token, message: "User SignIn Successful" }];
+            const result = { user: existingUser, token: token, message: "User SignIn Successful" };
             return result;
         }
         catch (error) {
-            const result = [{ statuscode: 400, error: error, message: "Signin Failed" }];
+            const result = { statuscode: 400, error: error, message: "Signin Failed" };
             return result;
         }
     }

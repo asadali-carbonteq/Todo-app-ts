@@ -4,9 +4,10 @@ import { Factory } from "../../Domain/FactoryMethod";
 import { Request, Response } from "express";
 import { UserNotCreatedException, UserNotDeletedException, UserNotUpdatedException } from "../../Infrastructure/Error/UserServiceError";
 import { inject, injectable } from "inversify";
+//import { SignInCommand } from "../command/UserCommand/SignInCommand";
 
 @injectable()
-export default class UserService {
+export class UserService {
     private userRepository: UserRepository;
 
 
@@ -17,15 +18,23 @@ export default class UserService {
     }
 
     async signIn(req: Request, res: Response) {
-        try {
-            const data = req.body;
-            const signinUser = await this.userRepository.SignIn(data.email, data.password);
-            return signinUser;
-        }
-        catch (error) {
-            return error;
-        }
+
     }
+    /*
+        async signIn(command: SignInCommand) {
+    
+            try {
+                const email = command.email;
+                const password = command.password;
+                const signinUser = await this.userRepository.SignIn(email, password);
+                return signinUser;
+            }
+            catch (error) {
+                return error;
+            }
+        }
+    */
+
 
     async createUser(req: Request, res: Response) {
         try {

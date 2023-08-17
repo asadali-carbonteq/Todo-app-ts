@@ -1,10 +1,12 @@
 import TodoRepository from "../../Infrastructure/Repository/TodoRepository";
 import { Factory } from "../../Domain/FactoryMethod";
-import { Request, Response } from "express";
 const { v4: uuidv4 } = require('uuid');
 import { TodoNotFoundException, InvalidPageOrSizeException, TodoNotCreatedException, TodoNotUpdatedException, TodoNotDeletedException } from "../../Infrastructure/Error/TodoServiceError";
 import { inject, injectable } from "inversify";
-import { Command } from "../../Infrastructure/commandHandler/GetTodoHandler";
+import { GetTodoCommand } from "../command/TodoCommand/GetTodoCommand";
+import { AddTodoCommand } from "../command/TodoCommand/AddTodoCommand";
+import { UpdateTodoCommand } from "../command/TodoCommand/UpdateTodoCommand";
+import { DeleteTodoCommand } from "../command/TodoCommand/DeleteTodoCommand";
 
 
 @injectable()
@@ -15,15 +17,11 @@ export class TodoService {
     constructor(
         @inject(TodoRepository) todoRepo: TodoRepository
     ) {
-
-
         this.todoRepository = todoRepo;
-        console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-        console.log(typeof todoRepo, String(todoRepo));
-    }
+    };
 
 
-    async getTodo(command: Command) {
+    async getTodo(command: GetTodoCommand) {
         try {
             const userId = command.userId;
             const pages = command.pages;
@@ -33,46 +31,43 @@ export class TodoService {
                 throw new InvalidPageOrSizeException("Invalid Pagination Values");
             }
 
-            console.log("hello hello Service here!");
-            console.log(userId, pages, size);
-
-            console.log(this.todoRepository);
-
             const todos = await this.todoRepository.GetTodo(userId, pages, size);
-            console.log("these are the todoes, ", todos);
+            console.log("Todos: ", todos);
             return todos;
         }
         catch (error) {
-            console.log(error);
-            //throw new TodoNotFoundException("Todo Not Found");
+            //console.log(error);
+            throw new TodoNotFoundException("Todo Not Found");
         }
     }
 
 
 
-    async addTodo(req: Request, res: Response) {
+    async addTodo(command: AddTodoCommand) {
         try {
-            const data = req.body;
-            const generatedUUID = uuidv4();
-            const myFactory = new Factory();
-            const todo = myFactory.TodoFactoryMethod(generatedUUID, data.body, data.userId);
+            const body = command.body;
+            const authorId = command.authorId;
 
-            const createdTodo = await this.todoRepository.CreateTodo(todo);
+            const generatedUUID = uuidv4();
+            //const myFactory = new Factory();
+            //const todo = myFactory.TodoFactoryMethod(generatedUUID, data.body, data.userId);
+
+            const createdTodo = await this.todoRepository.CreateTodo(generatedUUID, body, authorId);
 
             return createdTodo;
-        } catch (error) {
+        }
+        catch (error) {
             throw new TodoNotCreatedException("Todo Not Created");
         }
     }
 
 
-    async updateTodo(req: Request, res: Response) {
+    async updateTodo(command: UpdateTodoCommand) {
         try {
-            console.log(req.body);
-            const data = req.body;
-            console.log(data);
+            const todoId = command.todoId;
+            const body = command.body;
 
-            const updatedTodo = await this.todoRepository.UpdateTodo(req.params.id, data.body)
+            const updatedTodo = await this.todoRepository.UpdateTodo(todoId, body);//req.params.id, data.body)
 
             return updatedTodo;
         } catch (error) {
@@ -81,9 +76,10 @@ export class TodoService {
     }
 
 
-    async deleteTodo(req: Request, res: Response) {
+    async deleteTodo(command: DeleteTodoCommand) {
         try {
-            const deletedTodo = await this.todoRepository.DeleteTodo(req.params.id);
+            const todoId = command.todoId;
+            const deletedTodo = await this.todoRepository.DeleteTodo(todoId);
             return deletedTodo;
         }
         catch (error) {
