@@ -43,26 +43,26 @@ export default class UserRepository {
         }
     }
 
-    async CreateUser(user: User) {
+    async CreateUser(uuid: string, email: string, name: string, password: string) {
         try {
             const existingUser = await this.prisma.user.findUnique({
                 where: {
-                    email: user.getEmail(),
+                    email: email,
                 }
             });
             if (!existingUser) {
-                const hashedPassword = await bcrypt.hash(user.getPassword(), 10);
+                const hashedPassword = await bcrypt.hash(password, 10);
 
                 const createdUser = await this.prisma.user.create({
                     data: {
-                        user_id: user.getId(),
-                        email: user.getEmail(),
-                        name: user.getName(),
+                        user_id: uuid,
+                        email: email,
+                        name: name,
                         password: hashedPassword,
                     }
                 });
 
-                const token = jwt.sign({ email: user.getEmail(), id: user.getId() }, SECRET_KEY);
+                const token = jwt.sign({ email: email, id: uuid }, SECRET_KEY);
                 console.log(token);
                 const result = [{ user: createdUser, token: token, message: "New User Created" }];
 
@@ -99,16 +99,16 @@ export default class UserRepository {
         }
     }
 
-    async UpdateUser(user: User) {
+    async UpdateUser(id: string, name: string, email: string, password: string) {
         try {
             const updatedUser = await this.prisma.user.update({
                 where: {
-                    user_id: user.getId(),
+                    user_id: id,
                 },
                 data: {
-                    name: user.getName(),
-                    email: user.getEmail(),
-                    password: user.getPassword(),
+                    name: name,
+                    email: email,
+                    password: password,
                 }
             })
             return updatedUser;

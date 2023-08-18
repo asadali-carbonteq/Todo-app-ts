@@ -1,14 +1,16 @@
 import { UserService } from "../../../Application/Service/UserService";
 import DIContainer from "../../../Presentation/di-container";
-import { SignInCommand } from "../../../Application/command/UserCommand/SignInCommand";
+import { UpdateUserCommand } from "../../../Application/command/UserCommand/UpdateUserCommand";
 
 
-export class SignInHandler {
-    async handle(command: SignInCommand) {
+export class UpdateUserHandler {
+    async handle(command: UpdateUserCommand) {
         const userService = DIContainer.get<UserService>(UserService);
-        const user = await userService.signIn(command);
+        const user = await userService.updateUser(command);
         return user;
     }
 }
+
+
 
 

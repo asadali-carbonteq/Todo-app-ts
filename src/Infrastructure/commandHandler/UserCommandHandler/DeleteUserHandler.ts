@@ -1,12 +1,12 @@
 import { UserService } from "../../../Application/Service/UserService";
 import DIContainer from "../../../Presentation/di-container";
-import { SignInCommand } from "../../../Application/command/UserCommand/SignInCommand";
+import { DeleteUserCommand } from "../../../Application/command/UserCommand/DeleteUserCommand";
 
 
-export class SignInHandler {
-    async handle(command: SignInCommand) {
+export class DeleteUserHandler {
+    async handle(command: DeleteUserCommand) {
         const userService = DIContainer.get<UserService>(UserService);
-        const user = await userService.signIn(command);
+        const user = await userService.deleteUser(command);
         return user;
     }
 }

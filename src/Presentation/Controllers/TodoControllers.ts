@@ -9,16 +9,12 @@ import { UpdateTodoCommand } from '../../Application/command/TodoCommand/UpdateT
 import { DeleteTodoCommand } from '../../Application/command/TodoCommand/DeleteTodoCommand';
 const { CommandBus, LoggerMiddleware } = require("simple-command-bus");
 const commandHandlerMiddleware = require("../../Infrastructure/commandHandlerMiddleware")
-//import { CommandBus, LoggerMiddleware } from "simple-command-bus";
-//import commandHandlerMiddleware from "../../Infrastructure/commandHandlerMiddleware";
-
 
 
 const commandBus = new CommandBus([
     new LoggerMiddleware(console),
     commandHandlerMiddleware
 ]);
-
 
 
 @injectable()

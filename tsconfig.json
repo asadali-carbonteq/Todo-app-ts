@@ -99,7 +99,8 @@
     "skipLibCheck": true, /* Skip type checking all .d.ts files. */
     "types": [
       "reflect-metadata",
-      "node"
+      "node",
+      // "@types/simple-command-bus"
     ],
     "moduleResolution": "node",
     "experimentalDecorators": true,
