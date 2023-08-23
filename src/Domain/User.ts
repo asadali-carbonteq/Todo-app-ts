@@ -8,23 +8,18 @@ export class User {
     private password: string;
     private todo: Todo[];
 
-    constructor(id: string, name: string, email: string, password: string, todo: Todo[]) {
+    constructor(id: string, name: string, email: string, password: string, todo: Todo[] = []) {
         this.id = id;
         this.name = name;
         this.email = new Email();
         this.email.setEmail(email);
         this.password = password;
-        if (todo) {
-            this.todo = todo;
-        }
-        else {
-            this.todo = []
-        }
+        this.todo = todo;
     }
 
     setId(id: string): void { this.id = id; };
     setName(name: string): void { this.name = name; };
-    setEmail(xemail: string): void { this.email.setEmail(xemail); };
+    setEmail(email: string): void { this.email.setEmail(email); };
     setPassword(password: string): void { this.password = password; };
     setTodo(todo: Todo[]): void { this.todo = todo; };
 
@@ -33,4 +28,8 @@ export class User {
     getEmail(): string { return this.email.getEmail(); };
     getPassword(): string { return this.password; };
     getTodo(): Todo[] { return this.todo; };
+}
+
+export function UserFactoryMethod(id: string, name: string, email: string, password: string, todo: Todo[]) {
+    return new User(id, name, email, password, todo);
 }

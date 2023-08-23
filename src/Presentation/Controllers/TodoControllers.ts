@@ -1,14 +1,14 @@
 import 'reflect-metadata'
 import { Request, Response } from "express";
-import { TodoService } from "../../Application/Service/TodoService";
-import { inject, injectable } from 'inversify';
+import { injectable } from 'inversify';
 import { InvalidPageOrSizeException } from '../../Infrastructure/Error/TodoServiceError';
-import { GetTodoCommand } from '../../Application/command/TodoCommand/GetTodoCommand';
-import { AddTodoCommand } from '../../Application/command/TodoCommand/AddTodoCommand';
-import { UpdateTodoCommand } from '../../Application/command/TodoCommand/UpdateTodoCommand';
-import { DeleteTodoCommand } from '../../Application/command/TodoCommand/DeleteTodoCommand';
+import { GetTodoCommand } from '../../Infrastructure/command/TodoCommand/GetTodoCommand';
+import { AddTodoCommand } from '../../Infrastructure/command/TodoCommand/AddTodoCommand';
+import { UpdateTodoCommand } from '../../Infrastructure/command/TodoCommand/UpdateTodoCommand';
+import { DeleteTodoCommand } from '../../Infrastructure/command/TodoCommand/DeleteTodoCommand';
 const { CommandBus, LoggerMiddleware } = require("simple-command-bus");
-const commandHandlerMiddleware = require("../../Infrastructure/commandHandlerMiddleware")
+import commandHandlerMiddleware from '../../Infrastructure/commandHandlerMiddleware';
+
 
 
 const commandBus = new CommandBus([
@@ -19,13 +19,9 @@ const commandBus = new CommandBus([
 
 @injectable()
 export default class TodoController {
-    private myTodoService: TodoService;
 
-    constructor(
-        @inject(TodoService) todoService: TodoService
-    ) {
-        this.myTodoService = todoService;
-    }
+    constructor() { }
+
 
     async getTodo(req: Request, res: Response) {
         try {
@@ -41,11 +37,11 @@ export default class TodoController {
             const getTodoCommand = new GetTodoCommand(userId, pages, size);
             const todo = await commandBus.handle(getTodoCommand);
 
-            res.status(200).json({ message: "Get Todos Successfull.", todo })
+            res.status(todo.statusCode).json({ todo: todo.todo, message: todo.message });
         }
         catch (error) {
             console.log(error);
-            res.status(400).json({ error, message: "There was some error retrieving the Todos." });
+            res.status(400).json({ error: error, message: "There was some error retrieving the Todos." });
         }
     }
 
@@ -55,11 +51,9 @@ export default class TodoController {
             const myAddTodoCommand = new AddTodoCommand(data.body, data.userId);
             const todo = await commandBus.handle(myAddTodoCommand);
 
-            console.log("New Todo Created:");
-            res.status(201).json({ message: "New Todo Created", todo })
+            res.status(todo.statusCode).json({ todo: todo.todo, message: todo.message });
         } catch (error) {
-            console.log(error);
-            res.status(400).json({ error, message: "There was some error while Creating a Todo." });
+            res.status(400).json({ error: error, message: "There was some error while Creating a Todo." });
         }
     }
 
@@ -69,11 +63,9 @@ export default class TodoController {
             const body = req.body.body;
             const myUpdateTodoCommand = new UpdateTodoCommand(req.params.id, body);
             const todo = await commandBus.handle(myUpdateTodoCommand);
-            console.log("Updated successfully!!")
-            res.status(202).json({ message: "Todo Updated Successfully", todo })
+            res.status(todo.statusCode).json({ todo: todo.todo, message: todo.message });
         } catch (error) {
-            console.log(error);
-            res.status(501).json({ error, message: "There was some error while Updating the Todo." })
+            res.status(501).json({ error: error, message: "There was some error while Updating the Todo." })
         }
     }
 
@@ -83,11 +75,9 @@ export default class TodoController {
             const myDeleteTodoCommand = new DeleteTodoCommand(todoId);
             const todo = await commandBus.handle(myDeleteTodoCommand);
 
-            console.log("Todo Deleted successfully!!")
-            res.status(201).json({ message: "Todo Deleted Successfully.", todo })
+            res.status(todo.statusCode).json({ todo: todo.todo, message: todo.message });
         }
         catch (error) {
-            console.log(error);
             res.status(501).json({ error, message: "There was some error while deleting Todo" });
         }
     }

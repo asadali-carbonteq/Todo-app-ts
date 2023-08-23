@@ -1,12 +1,11 @@
 import TodoRepository from "../../Infrastructure/Repository/TodoRepository";
-import { Factory } from "../../Domain/FactoryMethod";
 const { v4: uuidv4 } = require('uuid');
 import { TodoNotFoundException, InvalidPageOrSizeException, TodoNotCreatedException, TodoNotUpdatedException, TodoNotDeletedException } from "../../Infrastructure/Error/TodoServiceError";
 import { inject, injectable } from "inversify";
-import { GetTodoCommand } from "../command/TodoCommand/GetTodoCommand";
-import { AddTodoCommand } from "../command/TodoCommand/AddTodoCommand";
-import { UpdateTodoCommand } from "../command/TodoCommand/UpdateTodoCommand";
-import { DeleteTodoCommand } from "../command/TodoCommand/DeleteTodoCommand";
+import { GetTodoCommand } from "../../Infrastructure/command/TodoCommand/GetTodoCommand";
+import { AddTodoCommand } from "../../Infrastructure/command/TodoCommand/AddTodoCommand";
+import { UpdateTodoCommand } from "../../Infrastructure/command/TodoCommand/UpdateTodoCommand";
+import { DeleteTodoCommand } from "../../Infrastructure/command/TodoCommand/DeleteTodoCommand";
 
 
 @injectable()
@@ -32,15 +31,12 @@ export class TodoService {
             }
 
             const todos = await this.todoRepository.GetTodo(userId, pages, size);
-            console.log("Todos: ", todos);
             return todos;
         }
         catch (error) {
-            //console.log(error);
             throw new TodoNotFoundException("Todo Not Found");
         }
     }
-
 
 
     async addTodo(command: AddTodoCommand) {
@@ -49,8 +45,6 @@ export class TodoService {
             const authorId = command.authorId;
 
             const generatedUUID = uuidv4();
-            //const myFactory = new Factory();
-            //const todo = myFactory.TodoFactoryMethod(generatedUUID, data.body, data.userId);
 
             const createdTodo = await this.todoRepository.CreateTodo(generatedUUID, body, authorId);
 
@@ -70,7 +64,8 @@ export class TodoService {
             const updatedTodo = await this.todoRepository.UpdateTodo(todoId, body);//req.params.id, data.body)
 
             return updatedTodo;
-        } catch (error) {
+        }
+        catch (error) {
             throw new TodoNotUpdatedException("Todo Not Updated");
         }
     }
@@ -87,6 +82,3 @@ export class TodoService {
         }
     }
 }
-
-
-

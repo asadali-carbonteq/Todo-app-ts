@@ -1,6 +1,6 @@
 import { TodoService } from "../../../Application/Service/TodoService";
 import DIContainer from "../../../Presentation/di-container";
-import { AddTodoCommand } from "../../../Application/command/TodoCommand/AddTodoCommand";
+import { AddTodoCommand } from "../../command/TodoCommand/AddTodoCommand";
 
 
 export class AddTodoHandler {

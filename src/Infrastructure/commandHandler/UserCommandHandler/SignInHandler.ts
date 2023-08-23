@@ -1,6 +1,6 @@
 import { UserService } from "../../../Application/Service/UserService";
 import DIContainer from "../../../Presentation/di-container";
-import { SignInCommand } from "../../../Application/command/UserCommand/SignInCommand";
+import { SignInCommand } from "../../command/UserCommand/SignInCommand";
 
 
 export class SignInHandler {

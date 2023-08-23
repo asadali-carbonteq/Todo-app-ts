@@ -1,6 +1,6 @@
 import { TodoService } from "../../../Application/Service/TodoService";
 import DIContainer from "../../../Presentation/di-container";
-import { DeleteTodoCommand } from "../../../Application/command/TodoCommand/DeleteTodoCommand";
+import { DeleteTodoCommand } from "../../command/TodoCommand/DeleteTodoCommand";
 
 
 export class DeleteTodoHandler {

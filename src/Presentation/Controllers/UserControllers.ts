@@ -1,13 +1,14 @@
 import 'reflect-metadata'
 import { Request, Response } from "express";
-import { UserService } from "../../Application/Service/UserService"
-import { inject, injectable } from "inversify";
-import { SignInCommand } from "../../Application/command/UserCommand/SignInCommand";
-import { SignUpCommand } from '../../Application/command/UserCommand/SignUpCommand';
-import { DeleteUserCommand } from '../../Application/command/UserCommand/DeleteUserCommand';
-import { UpdateUserCommand } from '../../Application/command/UserCommand/UpdateUserCommand';
+import { injectable } from "inversify";
+import { SignInCommand } from "../../Infrastructure/command/UserCommand/SignInCommand";
+import { SignUpCommand } from '../../Infrastructure/command/UserCommand/SignUpCommand';
+import { DeleteUserCommand } from '../../Infrastructure/command/UserCommand/DeleteUserCommand';
+import { UpdateUserCommand } from '../../Infrastructure/command/UserCommand/UpdateUserCommand';
 const { CommandBus, LoggerMiddleware } = require("simple-command-bus");
-const commandHandlerMiddleware = require("../../Infrastructure/commandHandlerMiddleware")
+import commandHandlerMiddleware from '../../Infrastructure/commandHandlerMiddleware';
+
+
 
 const commandBus = new CommandBus([
     new LoggerMiddleware(console),
@@ -17,27 +18,20 @@ const commandBus = new CommandBus([
 
 @injectable()
 export default class UserController {
-    private myUserService: UserService;
 
-    constructor(
-        @inject(UserService) userService: UserService,
-    ) {
-        this.myUserService = userService;
-    }
-
+    constructor() { }
 
 
     async SignIn(req: Request, res: Response) {
         try {
             const data = req.body;
             const mySignInCommand = new SignInCommand(data.email, data.password);
-            console.log(mySignInCommand);
             const user = await commandBus.handle(mySignInCommand);
 
-            res.status(201).json({ user });
+            res.status(user.statusCode).json({ user: user.user, token: user.token, message: user.message });
         }
         catch (error) {
-            res.status(500).json({ error, message: "There was some error while Signup." })
+            res.status(500).json({ error: error, message: "There was some error while Signup." })
         }
     }
 
@@ -49,7 +43,8 @@ export default class UserController {
             const mySignUpCommand = new SignUpCommand(data.name, data.email, data.password);
             const user = await commandBus.handle(mySignUpCommand);
 
-            res.status(201).json({ user });
+            //201
+            res.status(user.statusCode).json({ user: user.user, token: user.token, message: user.message });
         }
         catch (error) {
             res.status(500).json({ error, message: "There was some error while Signup." })
@@ -65,11 +60,10 @@ export default class UserController {
             const user = await commandBus.handle(myDeleteUserCommand);
 
 
-            res.status(202).json({ message: "User Deleted", user });
+            res.status(user.statusCode).json({ user: user.user, message: user.message });
         }
         catch (error) {
-            console.log(error);
-            res.status(500).json({ error, message: "There was some error deleting the user." });
+            res.status(500).json({ error: error, message: "There was some error deleting the user." });
         }
     }
 
@@ -81,11 +75,10 @@ export default class UserController {
             const myUpdateUserCommand = new UpdateUserCommand(req.params.id, data.name, data.email, data.password);
             const user = await commandBus.handle(myUpdateUserCommand);
 
-            res.status(200).json({ message: "User Deleted", user });
+            res.status(user.statusCode).json({ user: user.user, message: user.message });
         }
         catch (error) {
-            console.log(error);
-            res.status(500).json({ error, message: "There was some error updating the User." });
+            res.status(500).json({ error: error, message: "There was some error updating the User." });
         }
     }
 

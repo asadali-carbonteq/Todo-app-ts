@@ -1,13 +1,12 @@
 import UserRepository from "../../Infrastructure/Repository/UserRepository";
 const { v4: uuidv4 } = require('uuid');
-import { Factory } from "../../Domain/FactoryMethod";
 import { Request, Response } from "express";
 import { UserNotCreatedException, UserNotDeletedException, UserNotUpdatedException } from "../../Infrastructure/Error/UserServiceError";
 import { inject, injectable } from "inversify";
-import { SignInCommand } from "../command/UserCommand/SignInCommand";
-import { SignUpCommand } from "../command/UserCommand/SignUpCommand";
-import { DeleteUserCommand } from "../command/UserCommand/DeleteUserCommand";
-import { UpdateUserCommand } from "../command/UserCommand/UpdateUserCommand";
+import { SignInCommand } from "../../Infrastructure/command/UserCommand/SignInCommand";
+import { SignUpCommand } from "../../Infrastructure/command/UserCommand/SignUpCommand";
+import { DeleteUserCommand } from "../../Infrastructure/command/UserCommand/DeleteUserCommand";
+import { UpdateUserCommand } from "../../Infrastructure/command/UserCommand/UpdateUserCommand";
 
 @injectable()
 export class UserService {
@@ -26,7 +25,7 @@ export class UserService {
         try {
             const email = command.email;
             const password = command.password;
-            console.log("About to enter repository");
+
             const signinUser = await this.userRepository.SignIn(email, password);
             return signinUser;
         }
@@ -45,9 +44,9 @@ export class UserService {
             const generatedUUID = uuidv4();
 
             const createdUser = await this.userRepository.CreateUser(generatedUUID, email, name, password);
-
             return createdUser;
-        } catch (error) {
+        }
+        catch (error) {
             throw new UserNotCreatedException("New User Not Created");
         }
     }
@@ -57,10 +56,10 @@ export class UserService {
 
         try {
             const id = command.id;
-
             const deletedUser = await this.userRepository.DeleteUser(id);
             return deletedUser;
-        } catch (error) {
+        }
+        catch (error) {
             throw new UserNotDeletedException("User Not Deleted");
         }
     }
@@ -72,10 +71,11 @@ export class UserService {
             const name = command.name;
             const email = command.email;
             const password = command.password;
-            const updatedUser = await this.userRepository.UpdateUser(id, name, email, password);
 
+            const updatedUser = await this.userRepository.UpdateUser(id, name, email, password);
             return updatedUser;
-        } catch (error) {
+        }
+        catch (error) {
             throw new UserNotUpdatedException("User Not Updated");
         }
     }

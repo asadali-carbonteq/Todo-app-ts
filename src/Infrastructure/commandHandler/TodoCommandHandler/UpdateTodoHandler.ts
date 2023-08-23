@@ -1,6 +1,6 @@
 import { TodoService } from "../../../Application/Service/TodoService";
 import DIContainer from "../../../Presentation/di-container";
-import { UpdateTodoCommand } from "../../../Application/command/TodoCommand/UpdateTodoCommand";
+import { UpdateTodoCommand } from "../../command/TodoCommand/UpdateTodoCommand";
 
 export class UpdateTodoHandler {
     async handle(command: UpdateTodoCommand) {

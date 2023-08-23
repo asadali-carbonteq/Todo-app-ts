@@ -1,14 +1,14 @@
+import 'reflect-metadata';
 import express from "express";
 import TodoController from "../Controllers/TodoControllers";
 import { Request, Response } from "express";
 import protect from "../Middleware/protect";
-import 'reflect-metadata';
 import DIContainer from "../di-container";
 
 
 const todoRouter = express.Router();
 
-const controller = DIContainer.get<TodoController>(TodoController);
+const controller = DIContainer.resolve<TodoController>(TodoController);
 
 const getAllTodos: (req: Request, res: Response) => void = (req, res) => {
     controller.getTodo(req, res);

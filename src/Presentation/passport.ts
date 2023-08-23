@@ -17,7 +17,6 @@ passport.use(new GoogleStrategy({   //this data should have been save in an envi
     passReqToCallback: true
 },
     function (request: any, accessToken: string, refreshToken: string, profile: Profile, done: any) {
-        console.log(profile);
         return done(null, profile);
     }
 ));

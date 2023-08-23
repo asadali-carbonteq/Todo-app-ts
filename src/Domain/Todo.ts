@@ -17,3 +17,7 @@ export class Todo {
     getBody(): string { return this.body };
     getAuthorId(): string { return this.authorId };
 }
+
+export function TodoFactoryMethod(id: string, body: string, authorId: string) {
+    return new Todo(id, body, authorId);
+}

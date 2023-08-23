@@ -1,9 +1,9 @@
 import express from "express";
-import { port } from "./commanderCLI";
+import { port } from "../Bin/commanderCLI";
 import userRouter from "./routes/userRoutes"
 import todoRouter from "./routes/todoRoutes";
 import googleRouter from "./routes/googleRoutes";
-import { seedDatabase } from "./Faker/seedDB";
+import { seedDatabase } from "../Bin/Faker/seedDB";
 
 
 

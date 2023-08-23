@@ -1,6 +1,6 @@
 import { UserService } from "../../../Application/Service/UserService";
 import DIContainer from "../../../Presentation/di-container";
-import { DeleteUserCommand } from "../../../Application/command/UserCommand/DeleteUserCommand";
+import { DeleteUserCommand } from "../../command/UserCommand/DeleteUserCommand";
 
 
 export class DeleteUserHandler {

@@ -8,9 +8,13 @@ import { UserService } from '../Application/Service/UserService';
 import UserRepository from "../Infrastructure/Repository/UserRepository";
 var DIContainer = new Container();
 
-DIContainer.bind<TodoController>(TodoController).toSelf();
-DIContainer.bind<TodoService>(TodoService).toSelf();
 DIContainer.bind<TodoRepository>(TodoRepository).toSelf();
+DIContainer.bind<TodoService>(TodoService).toSelf();
+DIContainer.bind<interfaces.Factory<TodoController>>("lazyTodoController").toFactory<TodoController>((context) => {
+    return () => context.container.get<TodoController>(TodoController);
+});
+// DIContainer.bind<TodoController>(TodoController).toSelf();
+
 
 DIContainer.bind<UserRepository>(UserRepository).toSelf();
 DIContainer.bind<UserService>(UserService).toSelf();

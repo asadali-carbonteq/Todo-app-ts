@@ -1,6 +1,6 @@
 import { UserService } from "../../../Application/Service/UserService";
 import DIContainer from "../../../Presentation/di-container";
-import { UpdateUserCommand } from "../../../Application/command/UserCommand/UpdateUserCommand";
+import { UpdateUserCommand } from "../../command/UserCommand/UpdateUserCommand";
 
 
 export class UpdateUserHandler {

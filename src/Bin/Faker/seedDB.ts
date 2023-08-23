@@ -3,18 +3,16 @@ import { faker } from '@faker-js/faker';
 const bcrypt = require('bcrypt');
 
 
-export async function seedDatabase() {
+export async function seedDatabase(Total_Users: number) {
     try {
         const prisma = new PrismaClient();
 
         await prisma.todo.deleteMany({});
         await prisma.user.deleteMany({});
 
-        const userCount = 10;
         const users = [];
-        const todos = [];
 
-        for (let i = 0; i < userCount; i++) {
+        for (let i = 0; i < Total_Users; i++) {
             const hashedPassword = await bcrypt.hash(faker.internet.password(), 10);
             const user = await prisma.user.create({
                 data: {
@@ -38,7 +36,6 @@ export async function seedDatabase() {
                         authorId: user.user_id,
                     },
                 });
-                todos.push(todo);
             }
         }
 

@@ -16,6 +16,7 @@ const protect = async (req: Request, res: Response, next: NextFunction) => {
                 throw new Error("Invalid Token")
             }
             req.body = { ...req.body, userId: decoded.id || null }
+
             next();
         }
         else {

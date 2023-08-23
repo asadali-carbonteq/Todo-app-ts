@@ -22,8 +22,7 @@ const auth = async (req: Request, res: Response, next: NextFunction) => {
             res.status(401).json({ message: "Unathorized User" });
         }
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Unathorized User" });
+        res.status(500).json({ error: error, message: "Unathorized User" });
     }
 }
 

@@ -5,17 +5,17 @@ const {
     InMemoryLocator,
     HandleInflector
 } = require("simple-command-bus")
-const { CommandBus, LoggerMiddleware } = require("simple-command-bus");
 
-const GetTodoHandler = require("./commandHandler/TodoCommandHandler/GetTodoHandler").GetTodoHandler;
-const AddTodoHandler = require("./commandHandler/TodoCommandHandler/AddTodoHandler").AddTodoHandler;
-const UpdateTodoHandler = require("./commandHandler/TodoCommandHandler/UpdateTodoHandler").UpdateTodoHandler;
-const DeleteTodoHandler = require("./commandHandler/TodoCommandHandler/DeleteTodoHandler").DeleteTodoHandler;
+import { GetTodoHandler } from "./commandHandler/TodoCommandHandler/GetTodoHandler";
+import { AddTodoHandler } from "./commandHandler/TodoCommandHandler/AddTodoHandler";
+import { UpdateTodoHandler } from "./commandHandler/TodoCommandHandler/UpdateTodoHandler";
+import { DeleteTodoHandler } from "./commandHandler/TodoCommandHandler/DeleteTodoHandler";
 
-const SignInHandler = require("./commandHandler/UserCommandHandler/SignInHandler").SignInHandler;
-const SignUpHandler = require("./commandHandler/UserCommandHandler/SignUpHandler").SignUpHandler;
-const DeleteUserHandler = require("./commandHandler/UserCommandHandler/DeleteUserHandler").DeleteUserHandler;
-const UpdateUserHandler = require("./commandHandler/UserCommandHandler/UpdateUserHandler").UpdateUserHandler;
+import { SignInHandler } from "./commandHandler/UserCommandHandler/SignInHandler";
+import { SignUpHandler } from "./commandHandler/UserCommandHandler/SignUpHandler";
+import { DeleteUserHandler } from "./commandHandler/UserCommandHandler/DeleteUserHandler";
+import { UpdateUserHandler } from "./commandHandler/UserCommandHandler/UpdateUserHandler";
+
 
 
 const commandHandlerMiddleware = new CommandHandlerMiddleware(
@@ -35,6 +35,5 @@ const commandHandlerMiddleware = new CommandHandlerMiddleware(
 )
 
 
+export default commandHandlerMiddleware;
 
-
-module.exports = commandHandlerMiddleware

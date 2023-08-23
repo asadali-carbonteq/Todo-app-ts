@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import { Todo } from "../../Domain/Todo";
 import { injectable } from "inversify";
 
 
@@ -13,7 +12,6 @@ export default class TodoRepository {
 
     async GetTodo(id: string, pages: number, size: number) {
         try {
-            console.log("hello hello from the repository")
             const Per_Page = size;
             const skip = (Per_Page * (pages - 1));
             const todos = await this.prisma.todo.findMany({
@@ -26,12 +24,13 @@ export default class TodoRepository {
                     createdAt: 'asc',
                 }
             });
-            console.log("hello hello out the prisma.todo.findmany")
-            return todos;
+
+            const result = [{ statusCode: 201, todo: todos, message: "Get Todo Successful" }];
+            return result;
         }
         catch (error) {
-            console.log("There is some thing wrong:");
-            console.log(error);
+            const result = [{ statusCode: 400, error: error, message: "Get Todo Failed" }];
+            return result;
         }
     }
 
@@ -48,13 +47,13 @@ export default class TodoRepository {
                     }
                 }
             })
-            console.log(createdTodo);
-            return createdTodo;
+
+            const result = [{ statusCode: 201, todo: createdTodo, message: "Todo Created Successfully" }];
+            return result;
         }
         catch (error) {
-            console.log("The error is: ");
-            console.log(error)
-            return error;
+            const result = [{ statusCode: 400, error: error, message: "Todo Creation Failed" }];
+            return result;
         }
     }
 
@@ -68,12 +67,12 @@ export default class TodoRepository {
                     body: body,
                 }
             })
-            console.log("Updated successfully!!")
-            console.log(updatedTodo);
-            return updatedTodo;
+
+            const result = [{ statusCode: 201, todo: updatedTodo, message: "Todo Updated Successfully" }];
+            return result;
         } catch (error) {
-            console.log(error);
-            return error;
+            const result = [{ statusCode: 400, error: error, message: "Todo Updation Failed" }];
+            return result;
         }
     }
 
@@ -84,12 +83,13 @@ export default class TodoRepository {
                     todo_id: id,
                 }
             })
-            console.log("Todo Deleted successfully!!")
-            return deletedTodo;
+
+            const result = [{ statusCode: 201, todo: deletedTodo, message: "Todo Deleted Successfully" }];
+            return result;
         }
         catch (error) {
-            console.log(error);
-            return error;
+            const result = [{ statusCode: 400, error: error, message: "Todo Deletion Failed" }];
+            return result;
         }
     }
 }

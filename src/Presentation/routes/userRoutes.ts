@@ -4,13 +4,11 @@ import UserController from '../Controllers/UserControllers';
 import { Request, Response } from 'express';
 import protect from '../Middleware/protect';
 import DIContainer from '../di-container';
-import { UserProjectConfigExport } from 'vitest/dist/config';
 
 const userRouter = express.Router();
 
 
 const controller: UserController = DIContainer.resolve<UserController>(UserController);
-// const controller = DIContainer.get<UserController>(UserController);
 
 const createUser: (req: Request, res: Response) => void = (req, res) => {
     controller.SignUp(req, res);
@@ -38,12 +36,3 @@ userRouter.put("/user/update/:id", protect, updateUser);
 
 export default userRouter;
 
-
-/*
-Token:
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFzYWRAdGVzdC5jb20iLCJpZCI6ImE0Y2RhOGQ3LWZjM2MtNDRmMy1hNzE5LTIyNmUzYWU0MDE5ZiIsImlhdCI6MTY5MTY1NDY3Nn0.lz6SygvA-mPx_SwpHQPj7qh2IgVgEszLEMKeDTrOC_k
-password:
-asad
-email:
-asad@test.com
-*/
