@@ -19,10 +19,6 @@ const seedArg = seed
 
 const fakeseed = Number(seedArg.args[1]) || 0;
 
-if (fakeseed > 0) {
-    seedDatabase(fakeseed);
-}
-
-export { port };
+export { port, fakeseed };
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

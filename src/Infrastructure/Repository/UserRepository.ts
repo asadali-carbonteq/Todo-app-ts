@@ -3,12 +3,11 @@ const bcrypt = require('bcrypt');
 import jwt from "jsonwebtoken";
 import { UserAlreadyExistException, UserDoNotExistException } from "../Error/RepositoryError";
 import { injectable } from "inversify";
-import prisma from "../../libs/prisma";
-require('dotenv').config();
+import prisma from "../Database/prisma";
+import secret from "../Config/secretKey";
 
 
 
-const SECRET_KEY = process.env.SECRET_KEY as string;
 
 
 @injectable()
@@ -38,9 +37,9 @@ export default class UserRepository {
                 return new UserDoNotExistException("User Email or Password incorrect");
             }
 
-            const token = jwt.sign({ email: existingUser.email, id: existingUser.user_id }, SECRET_KEY);
+            const token = jwt.sign({ email: existingUser.email, id: existingUser.user_id }, secret.SECRET_KEY);
 
-            const result = { statusCode: 201, user: existingUser, token: token, message: "User SignIn Successful" };
+            const result = { statusCode: 200, user: existingUser, token: token, message: "User SignIn Successful" };
             return result;
         }
         catch (error) {
@@ -70,16 +69,16 @@ export default class UserRepository {
                     }
                 });
 
-                const token = jwt.sign({ email: email, id: uuid }, SECRET_KEY);
+                const token = jwt.sign({ email: email, id: uuid }, secret.SECRET_KEY);
 
-                const result = [{ statusCode: 201, user: createdUser, token: token, message: "New User Created" }];
+                const result = { statusCode: 201, user: createdUser, token: token, message: "New User Created" };
                 return result;
             } else {
                 return new UserAlreadyExistException("The user with this email already exists.");
             }
         }
         catch (error) {
-            const result = [{ statusCode: 400, error: error, message: "Signin Failed" }];
+            const result = { statusCode: 400, error: error, message: "Signin Failed" };
             return result;
         }
     }
@@ -101,11 +100,11 @@ export default class UserRepository {
                 }
             })
 
-            const result = [{ statusCode: 201, user: deletedUser, message: "User Deleted" }];
+            const result = { statusCode: 201, user: deletedUser, message: "User Deleted" };
             return result;
         }
         catch (error) {
-            const result = [{ statusCode: 400, error: error, message: "User Deletion Failed" }];
+            const result = { statusCode: 400, error: error, message: "User Deletion Failed" };
             return result;
         }
     }
@@ -114,6 +113,8 @@ export default class UserRepository {
 
     async UpdateUser(id: string, name: string, email: string, password: string) {
         try {
+            const hashedPassword = await bcrypt.hash(password, 10);
+
             const updatedUser = await this.prisma.user.update({
                 where: {
                     user_id: id,
@@ -121,15 +122,15 @@ export default class UserRepository {
                 data: {
                     name: name,
                     email: email,
-                    password: password,
+                    password: hashedPassword,
                 }
             })
 
-            const result = [{ statusCode: 201, user: updatedUser, message: "User Updated" }];
+            const result = { statusCode: 201, user: updatedUser, message: "User Updated" };
             return result;
         }
         catch (error) {
-            const result = [{ statusCode: 400, error: error, message: "User Updation Failed" }];
+            const result = { statusCode: 400, error: error, message: "User Updation Failed" };
             return result;
         }
     }

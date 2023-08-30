@@ -1,5 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { injectable } from "inversify";
+import prisma from "../Database/prisma";
+
 
 
 @injectable()
@@ -7,7 +9,7 @@ export default class TodoRepository {
     private prisma: PrismaClient;
 
     constructor() {
-        this.prisma = new PrismaClient();
+        this.prisma = prisma;
     }
 
     async GetTodo(id: string, pages: number, size: number) {
@@ -25,11 +27,11 @@ export default class TodoRepository {
                 }
             });
 
-            const result = [{ statusCode: 201, todo: todos, message: "Get Todo Successful" }];
+            const result = { statusCode: 201, todo: todos, message: "Get Todo Successful" };
             return result;
         }
         catch (error) {
-            const result = [{ statusCode: 400, error: error, message: "Get Todo Failed" }];
+            const result = { statusCode: 400, error: error, message: "Get Todo Failed" };
             return result;
         }
     }
@@ -48,11 +50,11 @@ export default class TodoRepository {
                 }
             })
 
-            const result = [{ statusCode: 201, todo: createdTodo, message: "Todo Created Successfully" }];
+            const result = { statusCode: 201, todo: createdTodo, message: "Todo Created Successfully" };
             return result;
         }
         catch (error) {
-            const result = [{ statusCode: 400, error: error, message: "Todo Creation Failed" }];
+            const result = { statusCode: 400, error: error, message: "Todo Creation Failed" };
             return result;
         }
     }
@@ -68,10 +70,10 @@ export default class TodoRepository {
                 }
             })
 
-            const result = [{ statusCode: 201, todo: updatedTodo, message: "Todo Updated Successfully" }];
+            const result = { statusCode: 201, todo: updatedTodo, message: "Todo Updated Successfully" };
             return result;
         } catch (error) {
-            const result = [{ statusCode: 400, error: error, message: "Todo Updation Failed" }];
+            const result = { statusCode: 400, error: error, message: "Todo Updation Failed" };
             return result;
         }
     }
@@ -84,11 +86,11 @@ export default class TodoRepository {
                 }
             })
 
-            const result = [{ statusCode: 201, todo: deletedTodo, message: "Todo Deleted Successfully" }];
+            const result = { statusCode: 201, todo: deletedTodo, message: "Todo Deleted Successfully" };
             return result;
         }
         catch (error) {
-            const result = [{ statusCode: 400, error: error, message: "Todo Deletion Failed" }];
+            const result = { statusCode: 400, error: error, message: "Todo Deletion Failed" };
             return result;
         }
     }

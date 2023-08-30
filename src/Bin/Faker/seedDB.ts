@@ -1,6 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { faker } from '@faker-js/faker';
 const bcrypt = require('bcrypt');
+const logger = require('pino')()
+import { SeedingException } from "../../Infrastructure/Error/SeedError";
 
 
 export async function seedDatabase(Total_Users: number) {
@@ -25,9 +27,9 @@ export async function seedDatabase(Total_Users: number) {
 
             users.push(user);
 
-            const todoCount = Math.floor(Math.random() * 5 + 2);//Every user will have 1 to 5 todos randomly selected.
+            const randomTodoCount = Math.floor(Math.random() * 5 + 2);
 
-            for (let j = 0; j < todoCount; j++) {
+            for (let j = 0; j < randomTodoCount; j++) {
                 const todo = await prisma.todo.create({
                     data: {
                         todo_id: faker.string.uuid(),
@@ -39,9 +41,9 @@ export async function seedDatabase(Total_Users: number) {
             }
         }
 
-        console.log('Database seeded successfully.');
+        logger.info('Database seeded successfully.');
     } catch (error) {
-        console.error('Error seeding database:', error);
+        throw new SeedingException("Error Seeding Database");
     }
 }
 

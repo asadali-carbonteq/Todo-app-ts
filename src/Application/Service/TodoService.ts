@@ -2,10 +2,10 @@ import TodoRepository from "../../Infrastructure/Repository/TodoRepository";
 const { v4: uuidv4 } = require('uuid');
 import { TodoNotFoundException, InvalidPageOrSizeException, TodoNotCreatedException, TodoNotUpdatedException, TodoNotDeletedException } from "../../Infrastructure/Error/TodoServiceError";
 import { inject, injectable } from "inversify";
-import { GetTodoCommand } from "../../Infrastructure/command/TodoCommand/GetTodoCommand";
-import { AddTodoCommand } from "../../Infrastructure/command/TodoCommand/AddTodoCommand";
-import { UpdateTodoCommand } from "../../Infrastructure/command/TodoCommand/UpdateTodoCommand";
-import { DeleteTodoCommand } from "../../Infrastructure/command/TodoCommand/DeleteTodoCommand";
+import GetTodoCommand from "../command/TodoCommand/GetTodoCommand";
+import { AddTodoCommand } from "../command/TodoCommand/AddTodoCommand";
+import { UpdateTodoCommand } from "../command/TodoCommand/UpdateTodoCommand";
+import { DeleteTodoCommand } from "../command/TodoCommand/DeleteTodoCommand";
 
 
 @injectable()
