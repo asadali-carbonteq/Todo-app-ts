@@ -1,19 +1,23 @@
 import { PrismaClient } from "@prisma/client";
-import { User } from "../../Domain/User";
 const bcrypt = require('bcrypt');
 import jwt from "jsonwebtoken";
 import { UserAlreadyExistException, UserDoNotExistException } from "../Error/RepositoryError";
 import { injectable } from "inversify";
-const SECRET_KEY = "Hello_World";
+import prisma from "../Database/prisma";
+import secret from "../Config/secretKey";
+import IUserRepository from "../../Domain/IRepositories/User/IUserRepository";
 
 
 @injectable()
-export default class UserRepository {
+export default class UserRepository implements IUserRepository {
     private prisma: PrismaClient;
 
+
     constructor() {
-        this.prisma = new PrismaClient();
+        this.prisma = prisma;
     }
+
+
 
     async SignIn(email: string, password: string) {
         try {
@@ -31,89 +35,101 @@ export default class UserRepository {
                 return new UserDoNotExistException("User Email or Password incorrect");
             }
 
-            const token = jwt.sign({ email: existingUser.email, id: existingUser.user_id }, SECRET_KEY);
+            const token = jwt.sign({ email: existingUser.email, id: existingUser.user_id }, secret.SECRET_KEY);
 
-            const result = [{ user: existingUser, token: token, message: "User SignIn Successful" }];
+            const result = { statusCode: 200, user: existingUser, token: token, message: "User SignIn Successful" };
             return result;
         }
         catch (error) {
-            const result = [{ statuscode: 400, error: error, message: "Signin Failed" }];
+            const result = { statusCode: 400, error: error, message: "Signin Failed" };
             return result;
         }
     }
 
-    async CreateUser(user: User) {
+
+
+    async CreateUser(uuid: string, email: string, name: string, password: string) {
         try {
             const existingUser = await this.prisma.user.findUnique({
                 where: {
-                    email: user.getEmail(),
+                    email: email,
                 }
             });
             if (!existingUser) {
-                const hashedPassword = await bcrypt.hash(user.getPassword(), 10);
+                const hashedPassword = await bcrypt.hash(password, 10);
 
                 const createdUser = await this.prisma.user.create({
                     data: {
-                        user_id: user.getId(),
-                        email: user.getEmail(),
-                        name: user.getName(),
+                        user_id: uuid,
+                        email: email,
+                        name: name,
                         password: hashedPassword,
                     }
                 });
 
-                const token = jwt.sign({ email: user.getEmail(), id: user.getId() }, SECRET_KEY);
-                console.log(token);
-                const result = [{ user: createdUser, token: token, message: "New User Created" }];
+                const token = jwt.sign({ email: email, id: uuid }, secret.SECRET_KEY);
 
+                const result = { statusCode: 201, user: createdUser, token: token, message: "New User Created" };
                 return result;
             } else {
                 return new UserAlreadyExistException("The user with this email already exists.");
             }
         }
         catch (error) {
-            const result = [{ statuscode: 400, error: error, message: "Signin Failed" }];
+            const result = { statusCode: 400, error: error, message: "Signin Failed" };
             return result;
         }
     }
 
+
+
     async DeleteUser(id: string) {
         try {
+            //Before deleting the user, all the todos need to be deleted. Deleting all user todos...
             const deletedTodo = await this.prisma.todo.deleteMany({
                 where: {
                     authorId: id,
                 }
             })
-            console.log("all todos for this user are deleted now deleting the user...");
+
             const deletedUser = await this.prisma.user.delete({
                 where: {
                     user_id: id,
                 }
             })
-            console.log("User Deleted.");
-            return deletedUser;
+
+            const result = { statusCode: 201, user: deletedUser, message: "User Deleted" };
+            return result;
         }
         catch (error) {
-            console.log(error);
-            return error;
+            const result = { statusCode: 400, error: error, message: "User Deletion Failed" };
+            return result;
         }
     }
 
-    async UpdateUser(user: User) {
+
+
+    async UpdateUser(id: string, name: string, email: string, password: string) {
         try {
+            const hashedPassword = await bcrypt.hash(password, 10);
+
             const updatedUser = await this.prisma.user.update({
                 where: {
-                    user_id: user.getId(),
+                    user_id: id,
                 },
                 data: {
-                    name: user.getName(),
-                    email: user.getEmail(),
-                    password: user.getPassword(),
+                    name: name,
+                    email: email,
+                    password: hashedPassword,
                 }
             })
-            return updatedUser;
+
+            const result = { statusCode: 201, user: updatedUser, message: "User Updated" };
+            return result;
         }
         catch (error) {
-            return error;
+            const result = { statusCode: 400, error: error, message: "User Updation Failed" };
+            return result;
         }
     }
 

@@ -1,12 +1,17 @@
 import UserRepository from "../../Infrastructure/Repository/UserRepository";
 const { v4: uuidv4 } = require('uuid');
-import { Factory } from "../../Domain/FactoryMethod";
-import { Request, Response } from "express";
 import { UserNotCreatedException, UserNotDeletedException, UserNotUpdatedException } from "../../Infrastructure/Error/UserServiceError";
 import { inject, injectable } from "inversify";
+import { SignInCommand } from "../command/UserCommand/SignInCommand";
+import { SignUpCommand } from "../command/UserCommand/SignUpCommand";
+import { DeleteUserCommand } from "../command/UserCommand/DeleteUserCommand";
+import { UpdateUserCommand } from "../command/UserCommand/UpdateUserCommand";
+
+
+
 
 @injectable()
-export default class UserService {
+export class UserService {
     private userRepository: UserRepository;
 
 
@@ -16,10 +21,14 @@ export default class UserService {
         this.userRepository = userRepo;
     }
 
-    async signIn(req: Request, res: Response) {
+
+    async signIn(command: SignInCommand) {
+
         try {
-            const data = req.body;
-            const signinUser = await this.userRepository.SignIn(data.email, data.password);
+            const email = command.email;
+            const password = command.password;
+
+            const signinUser = await this.userRepository.SignIn(email, password);
             return signinUser;
         }
         catch (error) {
@@ -27,43 +36,48 @@ export default class UserService {
         }
     }
 
-    async createUser(req: Request, res: Response) {
+
+
+    async createUser(command: SignUpCommand) {
         try {
-            const data = req.body;
+            const email = command.email;
+            const name = command.name;
+            const password = command.password;
             const generatedUUID = uuidv4();
-            const myFactory = new Factory();
-            const user = myFactory.UserFactoryMethod(generatedUUID, data.name, data.email, data.password, data.todo);
 
-            const createdUser = await this.userRepository.CreateUser(user);
-
+            const createdUser = await this.userRepository.CreateUser(generatedUUID, email, name, password);
             return createdUser;
-        } catch (error) {
+        }
+        catch (error) {
             throw new UserNotCreatedException("New User Not Created");
         }
     }
 
 
-    async deleteUser(req: Request, res: Response) {
+    async deleteUser(command: DeleteUserCommand) {
 
         try {
-            const deletedUser = await this.userRepository.DeleteUser(req.params.id);
+            const id = command.id;
+            const deletedUser = await this.userRepository.DeleteUser(id);
             return deletedUser;
-        } catch (error) {
+        }
+        catch (error) {
             throw new UserNotDeletedException("User Not Deleted");
         }
     }
 
 
-    async updateUser(req: Request, res: Response) {
+    async updateUser(command: UpdateUserCommand) {
         try {
-            const data = req.body;
-            const myFactory = new Factory();
-            const user = myFactory.UserFactoryMethod(req.params.id, data.name, data.email, data.passport, data.todo);
+            const id = command.id;
+            const name = command.name;
+            const email = command.email;
+            const password = command.password;
 
-            const updatedUser = await this.userRepository.UpdateUser(user);
-
+            const updatedUser = await this.userRepository.UpdateUser(id, name, email, password);
             return updatedUser;
-        } catch (error) {
+        }
+        catch (error) {
             throw new UserNotUpdatedException("User Not Updated");
         }
     }
