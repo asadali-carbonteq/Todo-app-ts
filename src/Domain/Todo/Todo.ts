@@ -1,3 +1,13 @@
+import { z } from 'zod';
+import { ValidationException } from '../../Infrastructure/Error/validationError';
+
+
+const TodoSchema = z.object({
+    id: z.string().uuid({ message: "Invalid UUID" }),
+    body: z.string(),
+    authorId: z.string().uuid({ message: "Invalid UUID" })
+})
+
 export class Todo {
     private id: string;
     private body: string;
@@ -18,9 +28,13 @@ export class Todo {
     getAuthorId(): string { return this.authorId };
 }
 
+
 export function TodoFactoryMethod(id: string, body: string, authorId: string) {
+    //guarding
+    const ValidationResult = TodoSchema.safeParse({ id, body, authorId });
+    if (!ValidationResult.success) {
+        throw new ValidationException(ValidationResult.error.message);
+    }
+
     return new Todo(id, body, authorId);
 }
-
-
-//make repository ports here in domain

@@ -1,7 +1,7 @@
 import app from "../HTTP/Bootstrap/app";
 const logger = require('pino')()
 import { port } from "./commanderCLI";
-import { performSeeding } from "./seeds";
+import { performSeeding } from "./Faker/seeds";
 
 
 

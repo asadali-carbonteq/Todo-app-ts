@@ -1,5 +1,5 @@
-import { seedDatabase } from "./Faker/seedDB";
-import { fakeseed } from "./commanderCLI";
+import { seedDatabase } from "./seedDB";
+import { fakeseed } from "../commanderCLI";
 const logger = require('pino')()
 
 

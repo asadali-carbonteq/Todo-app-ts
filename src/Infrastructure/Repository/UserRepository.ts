@@ -5,13 +5,11 @@ import { UserAlreadyExistException, UserDoNotExistException } from "../Error/Rep
 import { injectable } from "inversify";
 import prisma from "../Database/prisma";
 import secret from "../Config/secretKey";
-
-
-
+import IUserRepository from "../../Domain/IRepositories/User/IUserRepository";
 
 
 @injectable()
-export default class UserRepository {
+export default class UserRepository implements IUserRepository {
     private prisma: PrismaClient;
 
 

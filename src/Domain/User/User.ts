@@ -1,5 +1,16 @@
+import { ValidationException } from "../../Infrastructure/Error/validationError";
 import { Todo } from "../Todo/Todo";
 import { Email } from "../ValueObject/Email";
+import { z } from 'zod';
+
+
+const UserSchema = z.object({
+    id: z.string().uuid({ message: "Invalid UUID" }),
+    name: z.string(),
+    email: z.string().email({ message: "Invalid Email" }),
+    password: z.string()
+})
+
 
 export class User {
     private id: string;
@@ -31,5 +42,11 @@ export class User {
 }
 
 export function UserFactoryMethod(id: string, name: string, email: string, password: string, todo: Todo[]) {
+    //guarding
+    const ValidationResult = UserSchema.safeParse({ id, name, email, password });
+    if (!ValidationResult.success) {
+        throw new ValidationException(ValidationResult.error.message);
+    }
+
     return new User(id, name, email, password, todo);
 }

@@ -1,11 +1,11 @@
 import { PrismaClient } from "@prisma/client";
 import { injectable } from "inversify";
 import prisma from "../Database/prisma";
-
+import ITodoRepository from "../../Domain/IRepositories/Todo/ITodoRepository";
 
 
 @injectable()
-export default class TodoRepository {
+export default class TodoRepository implements ITodoRepository {
     private prisma: PrismaClient;
 
     constructor() {
@@ -27,7 +27,7 @@ export default class TodoRepository {
                 }
             });
 
-            const result = { statusCode: 201, todo: todos, message: "Get Todo Successful" };
+            const result = { statusCode: 200, todo: todos, message: "Get Todo Successful" };
             return result;
         }
         catch (error) {
@@ -70,7 +70,7 @@ export default class TodoRepository {
                 }
             })
 
-            const result = { statusCode: 201, todo: updatedTodo, message: "Todo Updated Successfully" };
+            const result = { statusCode: 200, todo: updatedTodo, message: "Todo Updated Successfully" };
             return result;
         } catch (error) {
             const result = { statusCode: 400, error: error, message: "Todo Updation Failed" };
@@ -86,7 +86,7 @@ export default class TodoRepository {
                 }
             })
 
-            const result = { statusCode: 201, todo: deletedTodo, message: "Todo Deleted Successfully" };
+            const result = { statusCode: 200, todo: deletedTodo, message: "Todo Deleted Successfully" };
             return result;
         }
         catch (error) {

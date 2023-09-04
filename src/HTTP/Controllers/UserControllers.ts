@@ -5,23 +5,28 @@ import { SignInCommand } from "../../Application/command/UserCommand/SignInComma
 import { SignUpCommand } from '../../Application/command/UserCommand/SignUpCommand';
 import { DeleteUserCommand } from '../../Application/command/UserCommand/DeleteUserCommand';
 import { UpdateUserCommand } from '../../Application/command/UserCommand/UpdateUserCommand';
-const { CommandBus, LoggerMiddleware } = require("simple-command-bus");
 import commandBus from '../../Application/CommandBus/commandBus';
-// import commandHandlerMiddleware from '../../Application/commandHandlerMiddleware';
+import Notification from "../../Infrastructure/NotificationService/Notification";
+import Email from "../../Infrastructure/NotificationService/Email/Email";
+import Slack from "../../Infrastructure/NotificationService/Slack/Slack";
 
-// console.log("user", commandHandlerMiddleware)
-
-// const commandBus = new CommandBus([
-//     new LoggerMiddleware(console),
-//     commandHandlerMiddleware
-// ]);
 
 
 
 @injectable()
 export default class UserController {
+    private notification: Notification;
+    private emailNotificaiton: Email;
+    private slackNotificaiton: Slack;
 
-    constructor() { }
+    constructor() {
+        this.notification = new Notification();
+        this.emailNotificaiton = new Email();
+        this.slackNotificaiton = new Slack();
+
+        this.notification.attachObserver(this.emailNotificaiton);
+        this.notification.attachObserver(this.slackNotificaiton);
+    }
 
 
     async SignIn(req: Request, res: Response) {
@@ -29,6 +34,11 @@ export default class UserController {
             const data = req.body;
             const mySignInCommand = new SignInCommand(data.email, data.password);
             const user = await commandBus.handle(mySignInCommand);
+
+            // Just Checking if my Code works for Observer pattern ..(+).. I have to think about where to put it?
+
+            this.notification.notifyObserver("User Sign In Successful");
+            //
 
             res.status(user.statusCode).json({ user: user.user, token: user.token, message: user.message });
         }
@@ -44,6 +54,8 @@ export default class UserController {
             const data = req.body;
             const mySignUpCommand = new SignUpCommand(data.name, data.email, data.password);
             const user = await commandBus.handle(mySignUpCommand);
+
+            this.notification.notifyObserver("User Sign Up Successful")
 
             res.status(user.statusCode).json({ user: user.user, token: user.token, message: user.message });
         }
