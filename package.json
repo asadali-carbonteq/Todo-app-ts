@@ -4,7 +4,8 @@
   "description": "Todo App in typescript",
   "main": "index.ts",
   "scripts": {
-    "dev": "ts-node-dev ./src/Bin/www.ts",
+    "dev": "ts-node-dev ./Bin/www.ts",
+    "db-generate": "npx prisma generate",
     "test": "vitest"
   },
   "keywords": [],

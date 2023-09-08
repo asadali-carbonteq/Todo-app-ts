@@ -107,6 +107,6 @@
     "emitDecoratorMetadata": true
   },
   "include": [
-    "src/***/**/*.ts"
+    "App/***/**/*.ts"
   ]
 }

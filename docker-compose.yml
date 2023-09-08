@@ -1,0 +1,24 @@
+version: '3.9'
+services:
+  mongo_db:
+    container_name: mongodb-container
+    image: mongo:latest
+    ports:
+      - 27017:27017
+    restart: always
+    volumes:
+      - mongo_data:/data/db
+  todoapp:
+    build: .
+    ports:
+      - 8080:8080
+    environment:
+      PORT: 8080
+      DATABASE_URI: mongodb://mongodb-container:27017
+      DB_NAME: my_db
+      Name: asadali
+    depends_on:
+      - mongo_db
+
+volumes:
+  mongo_data: {}
